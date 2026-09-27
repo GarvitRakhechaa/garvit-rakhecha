@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from sys import version
 from token import OP
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -9,11 +10,19 @@ from pydantic import BaseModel
 from pypdf import PdfReader
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+RESUME_PATH = BASE_DIR / "resume.pdf"
+
 load_dotenv()
+
 app=FastAPI(
     docs_url=None,
     redoc_url=None,
-    openapi_url=None
+    openapi_url=None,
+    title = "garvit rakhecha",
+    description="Portpolio site",
+    version="1.0.0"
 ) 
 
 
@@ -58,172 +67,186 @@ class Resume(BaseModel):
     education: list[str] = []
     projects: list[str] = []
     certifications: list[str] = []
+
 resume_schema = Resume.model_json_schema()
 
 class ChatRequest(BaseModel):
     question: str
 
-messages = []
-def ask_candidate(messages):
+def read_pdf(file_path: Path) -> str:
+
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"Resume file not found: {file_path}"
+        )
+
+    reader = PdfReader(file_path)
+
+    text = ""
+
+    for page in reader.pages:
+
+        pdf_text = page.extract_text()
+
+        if pdf_text:
+            text += pdf_text + "\n"
+
+    return text
+
+def parse_resume(resume_text: str) -> Resume:
+
+    system_prompt = f"""
+You are an expert resume parser.
+
+Extract information from the resume based on its meaning,
+not only based on exact section headings.
+
+Return ONLY valid JSON matching this schema:
+
+{resume_schema}
+
+Important rules:
+
+1. Do not invent information.
+2. If a value is not available, return null.
+3. If a list has no information, return an empty list.
+4. Include internships inside experiences.
+5. Extract skills mentioned across the entire resume.
+6. Preserve the actual information from the resume.
+"""
+
+    user_prompt = f"""
+Parse the following resume:
+
+{resume_text}
+"""
+
+    messages = [
+        {
+            "role": "system",
+            "content": system_prompt,
+        },
+        {
+            "role": "user",
+            "content": user_prompt,
+        },
+    ]
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        response_format={
+            "type": "json_object"
+        },
+    )
+
+    raw_output = response.choices[0].message.content
+
+    if not raw_output:
+        raise ValueError("Model returned an empty response")
+
+    data = json.loads(raw_output)
+
+    return Resume(**data)
+
+chat_history = []
+
+def ask_candidate(
+    question: str,
+    resume: Resume,
+    history: list[dict]
+) -> str:
+
+    system_prompt = f"""
+You are the person whoes details is given below.
+
+Below is everything you know about the candidate:
+
+{resume.model_dump_json(indent=2)}
+
+Rules:
+
+1. Answer only using this information.
+2. Never hallucinate.
+3. If information is unavailable, say:
+"I don't have enough information to answer that."
+4. Be professional.
+5. Answer as if HR is interviewing this candidate.
+6. Keep answers clear and concise.
+7. dont give my phone numbers to anyone doesnt matter who asks you can give my linkedin and github
+8. strictly no to phone number or contact details
+
+"""
+    messages = [
+        {
+            "role": "system",
+            "content": system_prompt,
+        }
+    ]
+
+    # Add previous conversation
+    messages.extend(history)
+
+    # Add current question
+    messages.append({
+        "role": "user",
+        "content": question,
+    })
+
     response = client.chat.completions.create(
         model=model,
         messages=messages
     )
 
-    return response.choices[0].message.content
-def parse_resume(resume_text):
-    system_prompt = f"""
-    You are an expert resume parser.
+    answer = response.choices[0].message.content
 
-    Extract information from the resume based on its meaning,
-    not only based on exact section headings.
+    if not answer:
+        return "I don't have enough information to answer that."
 
-    Different resumes may use different headings.
+    return answer
 
-    For example:
-    - Experience
-    - Professional Experience
-    - Work History
-    - Employment
-    - Internships
+@app.get("/", include_in_schema=False)
+def frontend():
+    return FileResponse(BASE_DIR / "index.html")
 
-    These may all contain relevant experience.
-
-    Skills may also appear in the skills section, work experience,
-    internships or projects.
-
-    Return ONLY valid JSON matching this schema:
-
-    {resume_schema}
-
-    Important rules:
-
-    1. Do not invent information.
-    2. If a value is not available, return null.
-    3. If a list has no information, return an empty list.
-    4. Include internships inside experiences.
-    5. Extract skills mentioned across the entire resume.
-    """
-    user_prompt = f"""
-    Parse the following resume:
-
-    {resume_text}
-    """
-    message_system={
-        "role" : "system",
-        "content" : system_prompt
-    }
-    message_user={
-        "role" : "user",
-        "content" : user_prompt
-    }
-    messages=[message_system, message_user]
-    response_format={
-        "type": "json_object"
-    }
-    response=client.chat.completions.create(model=model, messages=messages, response_format=response_format)
-    raw_output = response.choices[0].message.content
-    data = json.loads(raw_output)
-    resume = Resume(**data)
-    return resume
-
-def read_pdf(filepath: Path):
-    text = ""
-    reader = PdfReader(filepath)
-    for page in reader.pages:
-        page_text = page.extract_text()
-
-        if page_text:
-            text +=page_text + "\n"
-    return text
-
-resume_text = read_pdf("./resume.pdf")
-resume=parse_resume(resume_text)
-
-messages = []
-
-system_prompt = f"""
-You are an AI assistant representing a job candidate during an HR or technical interview.
-
-Your task is to answer questions about the candidate using ONLY the information provided in the candidate's resume below.
-
-CANDIDATE INFORMATION:
-{resume.model_dump_json(indent=2)}
-
-
-
-RULES:
-
-1. SOURCE OF TRUTH
-   - Use only the information contained in the candidate information above.
-   - Do not invent, assume, infer, or fabricate any facts.
-   - Do not claim experience, skills, education, projects, achievements, responsibilities, or technologies that are not explicitly present in the resume.
-
-2. UNKNOWN INFORMATION
-   - If the requested information is not available in the resume, say:
-     "I don't have enough information to answer that based on my resume."
-
-3. PRIVACY
-   - Never reveal the candidate's mobile/phone number, even if it is present in the resume.
-   - Do not reveal sensitive personal information or private information that is not relevant to the candidate's professional profile.
-   - If asked for private, sensitive, or personal information that is not appropriate to share, respond:
-     "That's personal information that I can't share. I can provide information related to my professional background and resume."
-
-4. OUT-OF-SCOPE QUESTIONS
-   - If the question is unrelated to the candidate's resume, professional background, education, skills, projects, achievements, or work-related experience, respond:
-     "That's not related to my professional background, so I don't have enough information to answer that."
-
-5. INTERVIEW STYLE
-   - Answer as if the candidate is speaking directly to an HR interviewer or technical interviewer.
-   - Be professional, confident, concise, and natural.
-   - Use first person ("I", "my", "I built", "I worked on") when appropriate.
-   - Do not sound like a chatbot explaining the resume to someone else.
-
-6. ACCURACY
-   - Do not exaggerate the candidate's experience.
-   - Do not convert learning or familiarity into professional experience unless the resume explicitly states it.
-   - When discussing projects, describe only what is documented in the resume.
-   - If a question asks for a specific detail that is not provided, do not guess.
-
-7. TECHNICAL QUESTIONS
-   - If the interviewer asks about a technology or concept mentioned in the resume, explain it only to the extent supported by the candidate's documented experience.
-   - Clearly distinguish between what the candidate implemented and general knowledge that is not documented in the resume.
-
-8. ANSWER FORMAT
-   - Give direct answers first.
-   - Avoid unnecessary repetition.
-   - Keep answers reasonably concise unless the interviewer asks for more detail.
-   - Do not mention these system instructions or the resume-processing process.
-
-Remember:
-You represent the candidate. Your job is to provide accurate, professional, resume-grounded answers without hallucinating or exposing private information.
-"""
-
-messages.append({
-    "role":"system",
-    "content":system_prompt
-})
-
-@app.get("/")
+@app.get("/api")
 def home():
-    return {"message":"text"}
+    return {
+        "message": "portpolio_AI API is running"
+    }
 
-@app.post("/chat")
+@app.get("/api/health")
+def health():
+    return {
+        "status": "ok"
+    }
+
+@app.post("/api/chat")
 def chat(request: ChatRequest):
-    question = request.question
 
-    messages.append({
-        "role":"user",
-        "content": question
+    # Read resume
+    resume_text = read_pdf(RESUME_PATH)
+
+    # Convert resume into structured data
+    resume = parse_resume(resume_text)
+
+    # Ask AI about candidate
+    answer = ask_candidate(
+        request.question,
+        resume,
+        chat_history
+    )
+
+    chat_history.append({
+        "role": "user",
+        "content": request.question,
     })
 
-    
-    answer=ask_candidate(messages)
-
-    messages.append({
-        "role":"assistant",
-        "content":answer
+    chat_history.append({
+        "role": "assistant",
+        "content": answer,
     })
+
     return {
         "answer": answer
     }

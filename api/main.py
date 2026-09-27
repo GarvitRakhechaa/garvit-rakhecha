@@ -10,9 +10,12 @@ from pydantic import BaseModel
 from pypdf import PdfReader
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 RESUME_PATH = BASE_DIR / "resume.pdf"
+
+
 
 load_dotenv()
 
@@ -25,6 +28,7 @@ app=FastAPI(
     version="1.0.0"
 ) 
 
+app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend"), name="static")
 
 Api_key = os.getenv("XKRIO_API_KEY")
 Base_url = os.getenv("XKIRO_BASE_URL")
@@ -207,7 +211,7 @@ Rules:
 
 @app.get("/", include_in_schema=False)
 def frontend():
-    return FileResponse(BASE_DIR / "index.html")
+    return FileResponse(BASE_DIR / "frontend" / "index.html")
 
 @app.get("/api")
 def home():
@@ -250,4 +254,8 @@ def chat(request: ChatRequest):
     return {
         "answer": answer
     }
+
+@app.get("/resume.pdf", include_in_schema=False)
+def resume():
+    return FileResponse(RESUME_PATH)
 

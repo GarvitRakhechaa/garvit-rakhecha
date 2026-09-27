@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Garvit Rakhecha | AI Engineer</title>
+
+    <meta
+        name="description"
+        content="Garvit Rakhecha — AI Engineer focused on LLM applications, RAG, AI agents and Python."
+    >
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- GSAP -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+        defer>
+    </script>
+
+    <!-- Markdown Parser -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+        defer>
+    </script>
+
+    <!-- HTML Sanitizer -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"
+        defer>
+    </script>
+
+    <!-- App JS -->
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="#home" class="logo">
+            <span>&lt;</span>Garvit<span>/&gt;</span>
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="#ai-assistant">AI Assistant</a>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#work">Work</a>
+            <a href="#education">Education</a>
+            <a href="#contact">Contact</a>
+
+        </nav>
+
+        <a
+            href="../resume.pdf"
+            download="Garvit_Rakhecha_Resume.pdf"
+            class="nav-resume"
+        >
+            Resume
+        </a>
+
+    </div>
+
+</header>
+
+
+<main>
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section id="home" class="hero">
+
+    <div class="container hero-container">
+
+        <div class="hero-content">
+
+            <div class="terminal-label">
+                <span class="terminal-dot"></span>
+                AI_ENGINEER.exe
+            </div>
+
+            <p class="hero-small">
+                Hello, I'm
+            </p>
+
+            <h1>
+                Garvit<br>
+                <span>Rakhecha.</span>
+            </h1>
+
+            <h2>
+                AI Engineer building practical
+                <span>LLM applications.</span>
+            </h2>
+
+            <p class="hero-description">
+                I work with Python, LLM APIs, RAG systems,
+                vector databases, AI agents and retrieval pipelines
+                to build practical AI applications.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#ai-assistant" class="btn btn-primary">
+                    Ask My AI
+                </a>
+
+                <a
+                    href="../resume.pdf"
+                    download="Garvit_Rakhecha_Resume.pdf"
+                    class="btn btn-secondary"
+                >
+                    Download Resume
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-terminal">
+
+            <div class="terminal-header">
+
+                <div class="terminal-controls">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="terminal-title">
+                    garvit@ai-engineer
+                </div>
+
+            </div>
+
+            <div class="terminal-body">
+
+                <p>
+                    <span class="green">garvit@ai</span>:~$
+                    whoami
+                </p>
+
+                <p class="terminal-output">
+                    AI Engineer
+                </p>
+
+                <p>
+                    <span class="green">garvit@ai</span>:~$
+                    stack
+                </p>
+
+                <p class="terminal-output">
+                    Python · LLM · RAG · Qdrant
+                </p>
+
+                <p>
+                    <span class="green">garvit@ai</span>:~$
+                    status
+                </p>
+
+                <p class="terminal-output">
+                    Building AI applications...
+                </p>
+
+                <p>
+                    <span class="green">garvit@ai</span>:~$
+                    <span class="cursor"></span>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     AI ASSISTANT
+===================================================== -->
+
+<section id="ai-assistant" class="section ai-section">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-number">
+                01
+            </span>
+
+            <div>
+                <p class="section-label">
+                    INTERACTIVE
+                </p>
+
+                <h2>
+                    Ask My AI
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div class="ai-intro">
+
+            <p>
+                Instead of browsing through a traditional project list,
+                you can directly ask questions about me, my technical
+                skills, education, experience and AI work.
+            </p>
+
+            <p class="ai-note">
+                Example: "What kind of RAG systems has Garvit built?"
+            </p>
+
+        </div>
+
+
+        <div class="chat-wrapper">
+
+            <div class="chat-header">
+
+                <div class="chat-status">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+                        <strong>Garvit's AI Assistant</strong>
+
+                        <small>
+                            Ask questions about Garvit
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="chat-powered">
+                    LLM
+                </div>
+
+            </div>
+
+
+            <!--
+                IMPORTANT:
+                This box intentionally starts EMPTY.
+            -->
+
+            <div
+                id="chatBox"
+                class="chat-box"
+            ></div>
+
+
+            <form
+                id="chatForm"
+                class="chat-input-area"
+            >
+
+                <input
+                    type="text"
+                    id="questionInput"
+                    placeholder="Ask something about Garvit..."
+                    autocomplete="off"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    id="sendButton"
+                >
+                    Send
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ABOUT
+===================================================== -->
+
+<section id="about" class="section">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-number">
+                02
+            </span>
+
+            <div>
+
+                <p class="section-label">
+                    PROFILE
+                </p>
+
+                <h2>
+                    About Me
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="about-grid">
+
+            <div class="about-main">
+
+                <p class="large-text">
+                    I'm a Computer Science Engineering graduate
+                    specializing in AI & ML, with a strong focus on
+                    practical LLM application development.
+                </p>
+
+                <p>
+                    My current work revolves around building applications
+                    using LLM APIs, structured outputs, prompt engineering,
+                    RAG pipelines, embeddings, semantic retrieval,
+                    vector databases and AI agents.
+                </p>
+
+                <p>
+                    I prefer learning by implementing concepts rather
+                    than only studying them. Most of the technologies
+                    listed on this website are backed by actual code,
+                    experiments or working projects.
+                </p>
+
+            </div>
+
+
+            <div class="about-info">
+
+                <div class="info-row">
+                    <span>Location</span>
+                    <strong>Rajasthan, India</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Degree</span>
+                    <strong>B.Tech CSE (AI & ML)</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Primary Language</span>
+                    <strong>Python</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Focus</span>
+                    <strong>LLM Applications</strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Interests</span>
+                    <strong>RAG · Agents · AI</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SKILLS
+===================================================== -->
+
+<section id="skills" class="section section-dark">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-number">
+                03
+            </span>
+
+            <div>
+
+                <p class="section-label">
+                    TECHNOLOGY
+                </p>
+
+                <h2>
+                    Skills
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="skills-grid">
+
+            <div class="skill-card">
+
+                <h3>Programming</h3>
+
+                <div class="skill-list">
+
+                    <span>Python</span>
+                    <span>REST APIs</span>
+                    <span>JSON</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="skill-card">
+
+                <h3>LLM / AI</h3>
+
+                <div class="skill-list">
+
+                    <span>LLM APIs</span>
+                    <span>Prompt Engineering</span>
+                    <span>Structured Outputs</span>
+                    <span>Pydantic</span>
+                    <span>ReAct Agents</span>
+                    <span>Prompt Chaining</span>
+                    <span>Streaming</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="skill-card">
+
+                <h3>RAG</h3>
+
+                <div class="skill-list">
+
+                    <span>Embeddings</span>
+                    <span>Semantic Search</span>
+                    <span>Cosine Similarity</span>
+                    <span>Reranking</span>
+                    <span>BM25</span>
+                    <span>Hybrid Search</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="skill-card">
+
+                <h3>Tools</h3>
+
+                <div class="skill-list">
+
+                    <span>Qdrant</span>
+                    <span>Sentence Transformers</span>
+                    <span>Cross Encoder</span>
+                    <span>FastAPI</span>
+                    <span>Git</span>
+                    <span>GitHub</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     WORK
+===================================================== -->
+
+<section id="work" class="section">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-number">
+                04
+            </span>
+
+            <div>
+
+                <p class="section-label">
+                    WHAT I BUILD
+                </p>
+
+                <h2>
+                    AI Engineering Work
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="work-list">
+
+            <article class="work-item">
+
+                <div class="work-number">
+                    01
+                </div>
+
+                <div>
+
+                    <h3>
+                        Retrieval-Augmented Generation
+                    </h3>
+
+                    <p>
+                        Building end-to-end RAG pipelines with document
+                        embeddings, vector search, metadata filtering,
+                        reranking, BM25 and hybrid retrieval.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-item">
+
+                <div class="work-number">
+                    02
+                </div>
+
+                <div>
+
+                    <h3>
+                        LLM Applications
+                    </h3>
+
+                    <p>
+                        Building practical applications around LLM APIs
+                        using structured outputs, prompt engineering,
+                        streaming and context-grounded generation.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-item">
+
+                <div class="work-number">
+                    03
+                </div>
+
+                <div>
+
+                    <h3>
+                        AI Agents
+                    </h3>
+
+                    <p>
+                        Implementing tool-using agents with reasoning,
+                        action parsing, tool execution and observation
+                        handling.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-item">
+
+                <div class="work-number">
+                    04
+                </div>
+
+                <div>
+
+                    <h3>
+                        AI Backend Systems
+                    </h3>
+
+                    <p>
+                        Creating Python and FastAPI backends that connect
+                        applications with LLM APIs and AI processing
+                        pipelines.
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     EDUCATION
+===================================================== -->
+
+<section id="education" class="section section-dark">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-number">
+                05
+            </span>
+
+            <div>
+
+                <p class="section-label">
+                    ACADEMIC
+                </p>
+
+                <h2>
+                    Education
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="education-card">
+
+            <div class="education-year">
+                2020 — 2024
+            </div>
+
+            <div>
+
+                <h3>
+                    Bachelor of Technology
+                </h3>
+
+                <p class="education-degree">
+                    Computer Science Engineering
+                    (Artificial Intelligence & Machine Learning)
+                </p>
+
+                <p>
+                    Government Engineering College Barmer,
+                    Rajasthan
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="honors">
+
+            <h3>
+                Honors & Activities
+            </h3>
+
+            <div class="honor-row">
+
+                <span>
+                    SIH 2022
+                </span>
+
+                <p>
+                    Smart India Hackathon Finalist
+                </p>
+
+            </div>
+
+            <div class="honor-row">
+
+                <span>
+                    INFINITO 2023
+                </span>
+
+                <p>
+                    Technical Coordinator
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CONTACT
+===================================================== -->
+
+<section id="contact" class="section contact-section">
+
+    <div class="container">
+
+        <div class="contact-content">
+
+            <p class="section-label">
+                GET IN TOUCH
+            </p>
+
+            <h2>
+                Let's build something
+                <span>useful with AI.</span>
+            </h2>
+
+            <p>
+                Interested in AI engineering, LLM applications,
+                RAG systems or related opportunities?
+            </p>
+
+
+            <div class="contact-links">
+
+                <a
+                    href="mailto:garvitrakhecha786@gmail.com"
+                >
+                    Email
+                </a>
+
+                <a
+                    href="https://www.linkedin.com/in/garvit-rakhecha"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    LinkedIn
+                </a>
+
+                <a
+                    href="https://github.com/garvitrakhechaa"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    GitHub
+                </a>
+
+                <a
+                    href="../resume.pdf"
+                    download="Garvit_Rakhecha_Resume.pdf"
+                >
+                    Resume
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <div class="container footer-inner">
+
+        <p>
+            © 2026 Garvit Rakhecha
+        </p>
+
+        <p>
+            Built with Python · FastAPI · LLMs
+        </p>
+
+    </div>
+
+</footer>
+
+</body>
+</html>
+

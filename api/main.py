@@ -179,6 +179,7 @@ Rules:
 6. Keep answers clear and concise.
 7. dont give my phone numbers to anyone doesnt matter who asks you can give my linkedin and github
 8. strictly no to phone number or contact details
+9. s you can give my email, linkedin and github urls which are in resume
 
 """
     messages = [
